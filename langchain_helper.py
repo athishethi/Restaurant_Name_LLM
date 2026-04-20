@@ -1,27 +1,61 @@
-from langchain_groq import ChatGroq
-from langchain_core.prompts import PromptTemplate
 import os
+from langchain_core.prompts import PromptTemplate
+from langchain_groq import ChatGroq
+
+
+# ✅ Initialize LLM properly using environment variable
+llm = ChatGroq(
+    model_name="llama3-8b-8192",   # safer default model
+    groq_api_key=os.getenv("GROQ_API_KEY"),
+    temperature=0.7
+)
+
+
+# Prompt 1 → Restaurant name
+prompt_template_name = PromptTemplate(
+    input_variables=["cuisine"],
+    template="""
+Suggest ONE fancy restaurant name for {cuisine} cuisine.
+Return ONLY the restaurant name.
+Do not give explanation.
+"""
+)
+
+name_chain = prompt_template_name | llm
+
+
+# Prompt 2 → Menu items
+prompt_template_items = PromptTemplate(
+    input_variables=["restaurant_name"],
+    template="""
+Suggest 8 menu items for the restaurant {restaurant_name}.
+Return ONLY comma separated menu items.
+Do not include explanation.
+"""
+)
+
+food_items_chain = prompt_template_items | llm
+
 
 def generate_restaurant_name_and_items(cuisine):
 
-    api_key = os.getenv("GROQ_API_KEY")
+    # Step 1 → Generate restaurant name
+    name_response = name_chain.invoke({"cuisine": cuisine})
+    name = name_response.content.strip().replace('"', '')
 
-    # 🚨 Fail early if key missing
-    if not api_key:
-        raise ValueError("GROQ_API_KEY is not set. Please add it to environment variables.")
+    # Step 2 → Generate menu
+    menu_response = food_items_chain.invoke({
+        "restaurant_name": name
+    })
+    menu = menu_response.content.strip()
 
-    llm = ChatGroq(
-        api_key=api_key,   # ✅ IMPORTANT: use api_key (not groq_api_key in newer versions)
-        model_name="llama3-8b-8192",
-        temperature=0.7
-    )
+    return {
+        "restaurant_name": name,
+        "menu_items": menu.split(", ")
+    }
 
-    prompt = PromptTemplate.from_template(
-        "Suggest a fancy restaurant name for {cuisine} cuisine and list 5 menu items."
-    )
 
-    chain = prompt | llm
-
-    response = chain.invoke({"cuisine": cuisine})
-
-    return response.content
+# For testing
+if __name__ == "__main__":
+    response = generate_restaurant_name_and_items("Indian")
+    print(response)
