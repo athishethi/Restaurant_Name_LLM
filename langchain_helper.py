@@ -1,5 +1,5 @@
 from langchain_groq import ChatGroq
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 import os
 
 def generate_restaurant_name_and_items(cuisine):
@@ -10,13 +10,12 @@ def generate_restaurant_name_and_items(cuisine):
         temperature=0.7
     )
 
-    prompt_template = PromptTemplate(
-        input_variables=["cuisine"],
-        template="Suggest a fancy restaurant name for {cuisine} cuisine and list 5 menu items."
+    prompt_template = PromptTemplate.from_template(
+        "Suggest a fancy restaurant name for {cuisine} cuisine and list 5 menu items."
     )
 
-    prompt = prompt_template.format(cuisine=cuisine)
+    chain = prompt_template | llm
 
-    response = llm.invoke(prompt)
+    response = chain.invoke({"cuisine": cuisine})
 
     return response.content
