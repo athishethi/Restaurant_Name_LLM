@@ -27,3 +27,5 @@ def generate_restaurant_name_and_items(cuisine):
     response = chain.invoke({"cuisine": cuisine})
 
     return response.content
+    from dotenv import load_dotenv
+load_dotenv()
