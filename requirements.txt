@@ -1,5 +1,3 @@
-langchain
-langchain-core
-langchain-community
+langchain==0.0.350
 langchain-groq
-groq
+streamlit
