@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+load_dotenv()
+
 from langchain_groq import ChatGroq
 from langchain_core.prompts import PromptTemplate
 import os
@@ -6,12 +9,11 @@ def generate_restaurant_name_and_items(cuisine):
 
     api_key = os.getenv("GROQ_API_KEY")
 
-    # 🚨 Hard fail if key missing
     if not api_key:
-        raise ValueError("GROQ_API_KEY is not set. Add it in Streamlit secrets or .env")
+        raise ValueError("GROQ_API_KEY not found. Check your .env file.")
 
     llm = ChatGroq(
-        api_key=api_key,   # ✅ CORRECT PARAM
+        api_key=api_key,
         model_name="llama3-8b-8192",
         temperature=0.7
     )
