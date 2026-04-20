@@ -1,21 +1,20 @@
 import streamlit as st
 import langchain_helper
 
-st.title("Restaurant Name Generator")
+st.title("🍽️ Restaurant Name Generator (Gemini AI)")
 
-cuisine = st.sidebar.selectbox("Pick a Cuisine", ("Indian", "Italian", "Mexican", "Arabic", "American"))
+cuisine = st.sidebar.selectbox(
+    "Pick a Cuisine",
+    ("Indian", "Italian", "Mexican", "Arabic", "American")
+)
 
 if cuisine:
     response = langchain_helper.generate_restaurant_name_and_items(cuisine)
-    st.header(response['restaurant_name'].strip())
-    menu_items = response['menu_items'].strip().split(",")
-    st.write("**Menu Items**")
+
+    st.header(response['restaurant_name'])
+
+    menu_items = response['menu_items'].split(",")
+
+    st.write("### Menu Items")
     for item in menu_items:
-        st.write("-", item)
-
-from dotenv import load_dotenv
-import os
-
-load_dotenv()
-
-api_key = os.getenv("GOOGLE_API_KEY")
+        st.write("-", item.strip())
