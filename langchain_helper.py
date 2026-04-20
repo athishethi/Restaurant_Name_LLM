@@ -29,3 +29,6 @@ def generate_restaurant_name_and_items(cuisine):
     return response.content
     from dotenv import load_dotenv
 load_dotenv()
+
+import os
+print("API KEY:", os.getenv("GROQ_API_KEY"))
